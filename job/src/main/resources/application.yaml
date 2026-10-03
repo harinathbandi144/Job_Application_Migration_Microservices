@@ -1,6 +1,11 @@
 spring:
   application:
     name: job
+  #Config Serviver
+  config:
+    import: optional:configserver:http://localhost:8080/
+#    profiles:
+#      active: dev
 
   datasource:
     url: jdbc:postgresql://localhost:5432/jobdb
@@ -14,6 +19,7 @@ spring:
 server:
   port: 8090
 
+#Eureka
 eureka:
   client:
     serviceUrl:

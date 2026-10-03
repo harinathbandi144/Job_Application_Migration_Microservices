@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: configservicer
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/harinathbandi144/Job_Application_Migration_Microservices.git
+          search-paths: company/src/main/resources
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
