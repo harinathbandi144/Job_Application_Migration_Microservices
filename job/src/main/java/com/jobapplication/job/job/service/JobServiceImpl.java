@@ -1,6 +1,8 @@
 package com.jobapplication.job.job.service;
 
 
+import com.jobapplication.job.job.clients.CompanyClient;
+import com.jobapplication.job.job.clients.ReviewClient;
 import com.jobapplication.job.job.dao.Job;
 import com.jobapplication.job.job.dto.JobDTO;
 import com.jobapplication.job.job.external.Company;
@@ -21,51 +23,36 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class JobServiceImpl implements JobService {
-
-    //private List<Job> jobs = new ArrayList<>();
-    //private Integer nextId = 1;
     private final JobRepository repository;
 
     @Autowired
     RestTemplate restTemplate;
 
+
+    private final CompanyClient companyClient;
+
+    private final ReviewClient reviewClient;
+
+
     @Override
     public List<JobDTO> getAllJobs() {
 
         List<Job> jobs = repository.findAll();
-        List<JobDTO> jobWithCompanyDTOS = new ArrayList<>();
-
-//        for(Job j : jobs){
-//            JobWithCompanyDTO jobsDTO = new JobWithCompanyDTO();
-//            jobsDTO.setJob(j);
-//            Company company =restTemplate.getForObject("http://COMPANY:8091/company/" + j.getCompanyId(), Company.class);
-//            jobsDTO.setCompany(company);
-//            jobWithCompanyDTOS.add(jobsDTO);
-//        }
         return jobs.stream().map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public String createJobs(List<Job> job) {
-//
-//        for(Job j:job){
-//            j.setId(nextId++);
-//        }
         repository.saveAll(job);
         return "Job Created Successfully";
     }
 
     private JobDTO convertToDTO(Job job){
 
-        Company company = restTemplate.getForObject("http://COMPANY:8091/company/" +job.getCompanyId(), Company.class);
+        Company company = companyClient.getCompany(job.getCompanyId());
 
-        Review[] reviewArray = restTemplate.getForObject(
-                "http://REVIEW:8092/reviews?companyId=" + job.getCompanyId(),
-                Review[].class
-        );
-
-        List<Review> reviews = Arrays.asList(reviewArray);
+        List<Review> reviews = reviewClient.getReview(job.getCompanyId());
         JobDTO jobDTO = JobMapper.mapToCompanyDtos(job, company, reviews);
 
         return jobDTO;
