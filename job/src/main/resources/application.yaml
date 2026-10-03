@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: job
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jobdb
+    username: root
+    password: admin
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 8090
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
