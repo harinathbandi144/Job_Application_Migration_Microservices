@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: apigateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: job
+              uri: lb://JOB
+              predicates:
+                - Path=/jobs/**
+
+            - id: company
+              uri: lb://COMPANY
+              predicates:
+                - Path=/company/**
+
+            - id: review
+              uri: lb://REVIEW
+              predicates:
+                - Path=/reviews/**
+
+            - id: eureka-server
+              uri: http://localhost:8761
+              predicates:
+                - Path=/eureka/main
+              filters: SetPath=/
+
+            - id: eureka-server-static
+              uri: http://localhost:8761
+              predicates:
+                - Path=/eureka/**
+
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.cloud.gateway.route.RouteDefinitionLocator: INFO
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      zipkin:
+              endpoint: http://localhost:9411/api/v2/spans
+  export:
+    zipkin:
+      endpoint: http://localhost:9411/api/v2/spans
+
+server:
+  port: 8765
+#Eureka
+
