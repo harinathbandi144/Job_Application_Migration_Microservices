@@ -9,6 +9,11 @@ import com.jobapplication.job.job.external.Company;
 import com.jobapplication.job.job.external.Review;
 import com.jobapplication.job.job.repository.JobRepository;
 import com.jobapplication.job.mapper.JobMapper;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,20 +33,33 @@ public class JobServiceImpl implements JobService {
     @Autowired
     RestTemplate restTemplate;
 
-
+    int attempt = 0;
     private final CompanyClient companyClient;
 
     private final ReviewClient reviewClient;
 
+//    @Override
+//    @CircuitBreaker(
+//            name = "companyBreaker",
+//            fallbackMethod = "companyBreakerFallback"
+//    )
+//    @Override
+//    @Retry(name = "companyBreaker",fallbackMethod = "companyBreakerFallback")
 
     @Override
+    @RateLimiter(name = "companyBreaker",fallbackMethod = "companyBreakerFallback")
     public List<JobDTO> getAllJobs() {
-
+        System.out.println("Retry count "+ ++attempt);
         List<Job> jobs = repository.findAll();
         return jobs.stream().map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
+    public List<String> companyBreakerFallback(Exception e){
+        List<String> list = new ArrayList<>();
+        list.add("Dummy");
+        return list;
+    }
     @Override
     public String createJobs(List<Job> job) {
         repository.saveAll(job);
@@ -51,7 +69,6 @@ public class JobServiceImpl implements JobService {
     private JobDTO convertToDTO(Job job){
 
         Company company = companyClient.getCompany(job.getCompanyId());
-
         List<Review> reviews = reviewClient.getReview(job.getCompanyId());
         JobDTO jobDTO = JobMapper.mapToCompanyDtos(job, company, reviews);
 

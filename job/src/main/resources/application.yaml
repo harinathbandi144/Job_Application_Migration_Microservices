@@ -27,6 +27,46 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
+#Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+
+  endpoint:
+    health:
+      show-details: always
+
+  health:
+    circuitbreakers:
+      enabled: true
+
+# Circute Breaker
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      companyBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        slidingWindowType: COUNT_BASED
+        max-attempts: 5
+        wait-duration: 2s
+
+  ratelimiter:
+    instances:
+      companyService:
+        limitForPeriod: 2
+        limitRefreshPeriod: 4s
+        timeoutDuration: 0
+
+
 #management:
 #  tracing:
 #    sampling:
