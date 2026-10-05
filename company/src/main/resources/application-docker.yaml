@@ -1,0 +1,29 @@
+job:
+  url: http://job:8090
+company:
+  url: http://company:8091
+review:
+  url: http://review:8092
+
+spring:
+  application:
+    name: company
+  datasource:
+    url: jdbc:postgresql://posygres:5432/companydb
+    username: root
+    password: admin
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8091
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://servicereg:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true

@@ -1,22 +1,21 @@
 job:
-  url: http://localhost:8090
+  url: http://job:8090
 company:
-  url: http://localhost:8091
+  url: http://company:8091
 review:
-  url: http://localhost:8092
-
+  url: http://review:8092
 
 spring:
   application:
     name: job
   #Config Serviver
   config:
-    import: optional:configserver:http://localhost:8080/
-#    profiles:
-#      active: dev
+    import: optional:configserver:http://config-server:8080/
+  #    profiles:
+  #      active: dev
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/jobdb
+    url: jdbc:postgresql://postgres:5432/jobdb
     username: root
     password: admin
 
@@ -31,7 +30,7 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://servicereg:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
 
@@ -75,10 +74,9 @@ resilience4j:
         timeoutDuration: 0
 
 
-#management:
+##management:
 #  tracing:
 #    sampling:
 #      probability: 1.0
-#    export:
-#      zipkin:
+#    zipkin:
 #        endpoint: http://zipkin:9411/api/v2/spans

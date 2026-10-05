@@ -1,3 +1,10 @@
+job:
+  url: http://localhost:8090
+company:
+  url: http://localhost:8091
+review:
+  url: http://localhost:8092
+
 spring:
   application:
     name: review
@@ -22,10 +29,10 @@ eureka:
       register-with-eureka: true
       fetch-registry: true
 
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-    export:
-      zipkin:
-        endpoint: http://zipkin:9411/api/v2/spans
+#management:
+#  tracing:
+#    sampling:
+#      probability: 1.0
+#    export:
+#      zipkin:
+#        endpoint: http://zipkin:9411/api/v2/spans
