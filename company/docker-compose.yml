@@ -1,8 +1,8 @@
 services:
 
   postgres:
-    image: postgres:17
-    container_name: job-postgres
+    image: postgres
+    container_name: postgres_container
     environment:
       POSTGRES_DB: jobdb
       POSTGRES_USER: root
@@ -14,50 +14,92 @@ services:
     networks:
       - job-network
 
-  job-service:
-    image: harinathbandi144/job-service:1.0
-    container_name: job-service
+  job:
+    image: harinathbandi144/job:latest
+    container_name: job
     ports:
-      - "8082:8082"
+      - "8090:8090"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/jobdb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: admin
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://servicereg:8761/eureka
     depends_on:
       - postgres
     networks:
-      - job-network
+      - microservice-network
+      - postgres
 
-  company-service:
-    image: harinathbandi144/company-service:1.0
-    container_name: company-service
+  company:
+    image: harinathbandi144/company:latest
+    container_name: company
     ports:
-      - "8083:8083"
+      - "8091:8091"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/companydb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: admin
+        - SPRING_PROFILES_ACTIVE=docker
     depends_on:
+      - servicereg
       - postgres
     networks:
-      - job-network
+      - microservice-network
+      - postgres
 
-  review-service:
-    image: harinathbandi144/review-service:1.0
-    container_name: review-service
+
+  review:
+    image: harinathbandi144/review:latest
+    container_name: review
     ports:
-      - "8084:8084"
+      - "8092:8092"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/reviewdb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: admin
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - postgres
     networks:
-      - job-network
+      - microservice-network
+      - postgres
+
+  config:
+    image: harinathbandi144/configservicer:latest
+    container_name: configservicer
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+    depends_on:
+      - servicereg
+    networks:
+      - microservice-network
+      - postgres
+
+
+  servicereg:
+    image: harinathbandi144/servicereg
+    container_name: servicereg
+    ports:
+      - "8761:8761"
+    depends_on:
+      - postgres
+    networks:
+      - microservice-network
+      - postgres
+
+  apigateway:
+    image: harinathbandi144/apigateway:latest
+    container_name: apigateway
+    ports:
+      - "8765:8765"
+    networks:
+      - microservice-network
+      - postgres
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
 
 volumes:
-  postgres_data:
+  postgres:
 
 networks:
-  job-network:
+  microservice-network:
+    driver: bridge
+  postgres:
+    driver: bridge
