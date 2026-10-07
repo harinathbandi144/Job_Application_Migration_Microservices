@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: company-deployment
+  labels:
+    app: company
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: company
+
+  template:
+    metadata:
+      labels:
+        app: company
+
+    spec:
+      containers:
+        - name: company
+          image: harinathbandi144/company
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8091
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: k8s

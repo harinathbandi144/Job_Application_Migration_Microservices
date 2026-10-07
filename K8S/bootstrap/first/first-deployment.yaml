@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: job-deployment
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: job
+
+  template:
+    metadata:
+      labels:
+        app: job
+
+    spec:
+      containers:
+        - name: job
+          image: harinathbandi144/job:1.0
+          ports:
+            - containerPort: 8090

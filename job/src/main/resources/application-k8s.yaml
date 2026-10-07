@@ -1,0 +1,101 @@
+spring:
+  application:
+    name: job
+
+  config:
+    import: optional:configserver:http://config-server-service:8080/
+
+  datasource:
+    url: jdbc:postgresql://postgres-service:5432/jobdb
+    username: root
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+
+# ==========================================
+# MICROSERVICE URLs
+# ==========================================
+
+services:
+  job:
+    url: http://job
+
+  company:
+    url: http://company
+
+  review:
+    url: http://review
+
+
+# ==========================================
+# EUREKA
+# ==========================================
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://servicereg-service:8761/eureka/
+
+  instance:
+    prefer-ip-address: true
+
+
+# ==========================================
+# RESILIENCE4J
+# ==========================================
+
+resilience4j:
+
+  circuitbreaker:
+    instances:
+
+      companyBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        slidingWindowType: COUNT_BASED
+
+
+# ==========================================
+# ACTUATOR
+# ==========================================
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+  endpoint:
+    health:
+      show-details: always
+
+  health:
+    circuitbreakers:
+      enabled: true
+
+
+# ==========================================
+# ZIPKIN / DISTRIBUTED TRACING
+# ==========================================
+
+  tracing:
+    sampling:
+      probability: 1.0
+
+    export:
+      zipkin:
+        endpoint: http://zipkin-service:9411/api/v2/spans
+
