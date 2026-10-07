@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: review-deployment
+  labels:
+    app: review
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: review
+
+  template:
+    metadata:
+      labels:
+        app: review
+
+    spec:
+      containers:
+        - name: review
+          image: harinathbandi144/review
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 9092
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: k8s

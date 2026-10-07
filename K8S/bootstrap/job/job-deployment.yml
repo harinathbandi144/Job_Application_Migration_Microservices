@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: job-deployment
+  labels:
+    app: job
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: job
+
+  template:
+    metadata:
+      labels:
+        app: job
+
+    spec:
+      containers:
+        - name: job
+          image: harinathbandi144/job:1.0
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8090
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: k8s
